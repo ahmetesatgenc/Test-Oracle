@@ -1,0 +1,237 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{multirow}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Test Oracle\\
+{\footnotesize \textsuperscript{}}
+}
+
+\author{\IEEEauthorblockN{\textsuperscript{} Ahmet Esat GENC}
+\IEEEauthorblockA{\textit{Design Verification and Test Group} \\
+\textit{Vestel Electronic}\\
+Manisa, Turkey \\
+ahmetgenc@vestel.com.tr}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address}
+\and
+\IEEEauthorblockN{3\textsuperscript{rd} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address}
+\and
+\IEEEauthorblockN{4\textsuperscript{th} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address}
+\and
+\IEEEauthorblockN{5\textsuperscript{th} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address}
+\and
+\IEEEauthorblockN{6\textsuperscript{th} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address}
+}
+
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\begin{IEEEkeywords}
+test oracle, software testing, television
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+
+\section{TEST ENVIRONMENT}
+
+
+\section{BACKGROUND AND RELATED WORK}
+
+
+\subsection{Feature Detection and Descriptor Extractor}
+
+
+
+\subsection{Transformation}
+
+
+
+ \subsection{Image Matching}
+
+\subsubsection{Template Matching}
+
+
+\subsubsection{Histogram Matching}
+
+
+\subsubsection{Pixel Matching}
+
+
+\subsubsection{F-Score}
+
+
+\section{Experiment Results}
+We, first, compare the performance of the feature detector and descriptor extractor functions. Due to the plenty of images to compare, the quickest algorithm saves more time regarding to other functions.
+SURF which is employed for feature detection and FREAK which is employed for descriptor extraction gives the quickest result as may be seen in table-1. 
+
+\begin{table}[h]
+\caption{Feature Detector and Descriptor Extractor} \label{table1}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+Instrument & Time(sec) & Similarity \\ \hline
+AKAZE & 1,680 & 0.773 \\ \hline
+SURF+BRIEF & 1,460 & 0.786 \\ \hline
+SURF+FREAK & 1,245 & 0.829 \\ \hline
+GFFT+BRISK & 2,501 & 0.808 \\ \hline
+ORB & 1,827 & 0.781 \\ \hline
+SIFT & 2,032 & 0.773 \\ \hline
+SURF & 1,827 & 0.802 \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+After finding the feature detector and descriptor algorithm, both perspective transform and affine transform algorithm is employed to compare effectiveness of the transformation functions. Effect of both algorithm are presented with comparison algorithms.
+Finally, grabbed and reference image pairs which are compared in combination of comparison algorithms such as template matching, pixel matching, histogram matching, template and histogram matching, template and pixel matching, histogram and pixel matching, template and histogram and pixel matching.
+Because of the nature of template matching, a window size should be determined to compare templates of the images. Hence, 14 different window sizes are used in every combination.
+Accuracy of each combination is calculated in range of 0 to 100 of threshold value to find optimum threshold value by using f-score function.
+Results of each data whose image resolution is 1920x1080 are listed in table-2 to table-8
+
+
+\begin{table*}[]
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{16}{|c|}{Template Matching} \\ \hline
+ & \multicolumn{5}{c|}{f1 Score} & \multicolumn{5}{c|}{f2 Score} & \multicolumn{5}{c|}{f0.5 Score} \\ \hline
+ & \multicolumn{2}{c|}{FP Data Set} & \multicolumn{2}{c|}{TN Data Set} &  & \multicolumn{2}{c|}{FP Data Set} & \multicolumn{2}{c|}{TN Data Set} &  & \multicolumn{2}{c|}{FP Data Set} & \multicolumn{2}{c|}{TN Data Set} &  \\ \hline
+ & fp & tn & fn & tp & Accuracy & fp & tn & fn & tp & Accuracy & fp & tn & fn & tp & Accuracy \\ \hline
+640x360 & 39 & 57 & 0 & 2563 & 0.985332 & 39 & 57 & 0 & 2563 & 0.985332 & 35 & 61 & 0 & 2563 & 0.986837 \\ \hline
+480x270 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+384x216 & 37 & 59 & 0 & 2563 & 0.986084 & 35 & 61 & 0 & 2563 & 0.986084 & 34 & 62 & 0 & 2563 & 0.986461 \\ \hline
+320x180 & 36 & 60 & 0 & 2563 & 0.986461 & 36 & 60 & 0 & 2563 & 0.986461 & 32 & 64 & 1 & 2562 & 0.987589 \\ \hline
+240x135 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+192x108 & 16 & 80 & 0 & 2563 & 0.993982 & 16 & 80 & 0 & 2563 & 0.993982 & 7 & 89 & 2 & 2561 & 0.996615 \\ \hline
+160x108 & 16 & 80 & 0 & 2563 & 0.993982 & 16 & 80 & 0 & 2563 & 0.993982 & 7 & 89 & 2 & 2561 & 0.996615 \\ \hline
+120x90 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+96x90 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+64x60 & 4 & 92 & 0 & 2563 & 0.998495 & 4 & 92 & 0 & 2563 & 0.998495 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+48x45 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+32x30 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+16x20 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+16x20 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+\end{tabular}
+\end{table*}
+
+As predicted in the "Template Matching" section, the accuracy of the algorithm increases when the window size becomes smaller. However, after a value, the maximum accuracy is reached. Taking into account that the smaller window size will result in more processing loads, the maximum window size for which maximum accuracy is achieved can be considered as the optimum window size which is 240x135. The f0.5-score, which is employed to not miss the false positive results, shows better results in smaller window sizes, although their performance in large window sizes is close to f1 and f2-scores. It is observed that the maximum window size with the minimum "fp" values for the F0.5-score while perspective transform is used is 120x90. 
+
+
+\begin{table*}[]
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{16}{|c|}{Template and Histogram Matching} \\ \hline
+ & \multicolumn{5}{c|}{f1 Score} & \multicolumn{5}{c|}{f2 Score} & \multicolumn{5}{c|}{f0.5 Score} \\ \hline
+ & \multicolumn{2}{c|}{FP Data Set} & \multicolumn{2}{c|}{TN Data Set} &  & \multicolumn{2}{c|}{FP Data Set} & \multicolumn{2}{c|}{TN Data Set} &  & \multicolumn{2}{c|}{FP Data Set} & \multicolumn{2}{c|}{TN Data Set} &  \\ \hline
+ & fp & tn & fn & tp & Accuracy & fp & tn & fn & tp & Accuracy & fp & tn & fn & tp & Accuracy \\ \hline
+640x360 & 39 & 57 & 0 & 2563 & 0.985332 & 39 & 57 & 0 & 2563 & 0.985332 & 35 & 61 & 0 & 2563 & 0.986837 \\ \hline
+480x270 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+384x216 & 37 & 59 & 0 & 2563 & 0.986084 & 35 & 61 & 0 & 2563 & 0.986084 & 34 & 62 & 0 & 2563 & 0.986461 \\ \hline
+320x180 & 36 & 60 & 0 & 2563 & 0.986461 & 36 & 60 & 0 & 2563 & 0.986461 & 32 & 64 & 1 & 2562 & 0.987589 \\ \hline
+240x135 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+192x108 & 16 & 80 & 0 & 2563 & 0.993982 & 16 & 80 & 0 & 2563 & 0.993982 & 7 & 89 & 2 & 2561 & 0.996615 \\ \hline
+160x108 & 16 & 80 & 0 & 2563 & 0.993982 & 16 & 80 & 0 & 2563 & 0.993982 & 7 & 89 & 2 & 2561 & 0.996615 \\ \hline
+120x90 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+96x90 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+64x60 & 4 & 92 & 0 & 2563 & 0.998495 & 4 & 92 & 0 & 2563 & 0.998495 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+48x45 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+32x30 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+16x20 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+16x20 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+\end{tabular}
+\end{table*}
+
+
+
+
+
+
+
+
+
+\begin{table*}[]
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{16}{|c|}{Template and Pixel Matching} \\ \hline
+ & \multicolumn{5}{c|}{f1 Score} & \multicolumn{5}{c|}{f2 Score} & \multicolumn{5}{c|}{f0.5 Score} \\ \hline
+ & \multicolumn{2}{c|}{FP Data Set} & \multicolumn{2}{c|}{TN Data Set} &  & \multicolumn{2}{c|}{FP Data Set} & \multicolumn{2}{c|}{TN Data Set} &  & \multicolumn{2}{c|}{FP Data Set} & \multicolumn{2}{c|}{TN Data Set} &  \\ \hline
+ & fp & tn & fn & tp & Accuracy & fp & tn & fn & tp & Accuracy & fp & tn & fn & tp & Accuracy \\ \hline
+640x360 & 39 & 57 & 0 & 2563 & 0.985332 & 39 & 57 & 0 & 2563 & 0.985332 & 35 & 61 & 0 & 2563 & 0.986837 \\ \hline
+480x270 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+384x216 & 37 & 59 & 0 & 2563 & 0.986084 & 35 & 61 & 0 & 2563 & 0.986084 & 34 & 62 & 0 & 2563 & 0.986461 \\ \hline
+320x180 & 36 & 60 & 0 & 2563 & 0.986461 & 36 & 60 & 0 & 2563 & 0.986461 & 32 & 64 & 1 & 2562 & 0.987589 \\ \hline
+240x135 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+192x108 & 16 & 80 & 0 & 2563 & 0.993982 & 16 & 80 & 0 & 2563 & 0.993982 & 7 & 89 & 2 & 2561 & 0.996615 \\ \hline
+160x108 & 16 & 80 & 0 & 2563 & 0.993982 & 16 & 80 & 0 & 2563 & 0.993982 & 7 & 89 & 2 & 2561 & 0.996615 \\ \hline
+120x90 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+96x90 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+64x60 & 4 & 92 & 0 & 2563 & 0.998495 & 4 & 92 & 0 & 2563 & 0.998495 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+48x45 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+32x30 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+16x20 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+16x20 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+\end{tabular}
+\end{table*}
+
+
+
+
+
+\begin{table*}[]
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{16}{|c|}{Template and Histogram and Pixel Matching} \\ \hline
+ & \multicolumn{5}{c|}{f1 Score} & \multicolumn{5}{c|}{f2 Score} & \multicolumn{5}{c|}{f0.5 Score} \\ \hline
+ & \multicolumn{2}{c|}{FP Data Set} & \multicolumn{2}{c|}{TN Data Set} &  & \multicolumn{2}{c|}{FP Data Set} & \multicolumn{2}{c|}{TN Data Set} &  & \multicolumn{2}{c|}{FP Data Set} & \multicolumn{2}{c|}{TN Data Set} &  \\ \hline
+ & fp & tn & fn & tp & Accuracy & fp & tn & fn & tp & Accuracy & fp & tn & fn & tp & Accuracy \\ \hline
+640x360 & 39 & 57 & 0 & 2563 & 0.985332 & 39 & 57 & 0 & 2563 & 0.985332 & 35 & 61 & 0 & 2563 & 0.986837 \\ \hline
+480x270 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+384x216 & 37 & 59 & 0 & 2563 & 0.986084 & 35 & 61 & 0 & 2563 & 0.986084 & 34 & 62 & 0 & 2563 & 0.986461 \\ \hline
+320x180 & 36 & 60 & 0 & 2563 & 0.986461 & 36 & 60 & 0 & 2563 & 0.986461 & 32 & 64 & 1 & 2562 & 0.987589 \\ \hline
+240x135 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+192x108 & 16 & 80 & 0 & 2563 & 0.993982 & 16 & 80 & 0 & 2563 & 0.993982 & 7 & 89 & 2 & 2561 & 0.996615 \\ \hline
+160x108 & 16 & 80 & 0 & 2563 & 0.993982 & 16 & 80 & 0 & 2563 & 0.993982 & 7 & 89 & 2 & 2561 & 0.996615 \\ \hline
+120x90 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+96x90 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+64x60 & 4 & 92 & 0 & 2563 & 0.998495 & 4 & 92 & 0 & 2563 & 0.998495 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+48x45 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+32x30 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+16x20 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+16x20 & 2 & 94 & 0 & 2563 & 0.999247 & 2 & 94 & 0 & 2563 & 0.999247 & 0 & 96 & 2 & 2561 & 0.999247 \\ \hline
+\end{tabular}
+\end{table*}
+
+\end{document}
