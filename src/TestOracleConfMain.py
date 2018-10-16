@@ -54,7 +54,7 @@ def main():
     print "transformation function is:", transformation
     print "image matching algorithm is:", image_matching
     feature_mapping = {'FAST':FAST_feature,'STAR':STAR_feature,'SIFT':SIFT_feature,'SURF':SURF_feature,'ORB':ORB_feature,
-                       'BRISK':BRISK_feature,'MSER':MSER_feature,'SimpleBlob':SIMPLEBLOB_feature}
+                       'BRISK':BRISK_feature,'SimpleBlob':SIMPLEBLOB_feature}
     descriptor_mapping = {'SIFT':SIFT_desc_extract,'SURF':SURF_desc_extract,'BRIEF':BRIEF_desc_extract,'BRISK':BRISK_desc_extract,
                           'ORB':ORB_desc_extract,'FREAK':FREAK_desc_extract}
     transformation_mapping = {'Affine Transform':Affine_transform, 'Perspective Transform':Perspective_transform}
