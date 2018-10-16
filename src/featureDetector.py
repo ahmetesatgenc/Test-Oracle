@@ -55,15 +55,6 @@ def BRISK_feature(img):
 
     return kp
 
-def MSER_feature(img):
-
-    #Can be used with SIFT, SURF, BRIEF, BRISK, ORB and FREAK as descriptor extractor
-
-    mser = cv2.MSER_create()
-    kp = mser.detect(img, None)
-
-    return kp
-
 def SIMPLEBLOB_feature(img):
 
     #Can be used with SIFT, SURF, BRIEF, BRISK, ORB and FREAK as descriptor extractor
