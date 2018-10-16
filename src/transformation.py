@@ -7,9 +7,12 @@ def Affine_transform(kp1, kp2, img_grab, goodMatches):
     dst_pts = np.float32([kp2[m.trainIdx].pt for m in goodMatches])
     sz = img_grab.shape
     warp_matrix = cv2.estimateRigidTransform(src_pts, dst_pts, fullAffine=True)
-    warpedImage = cv2.warpAffine(img_grab, warp_matrix, (sz[1], sz[0]), flags=cv2.INTER_LINEAR + cv2.WARP_INVERSE_MAP)
+    if warp_matrix is not None:
+        warpedImage = cv2.warpAffine(np.asarray(img_grab, dtype=np.float32), warp_matrix, (sz[1], sz[0]), flags=cv2.INTER_LINEAR + cv2.WARP_INVERSE_MAP)
+    else:
+        warpedImage = img_grab
 
-    return warpedImage
+    return np.asarray(warpedImage, dtype=np.uint8)
 
 
 def Perspective_transform(kp1,kp2,img_grab,goodMatches):
