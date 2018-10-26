@@ -412,7 +412,7 @@ def all_IM(array_one, array_two, array_three, selected_dataset, folder):
 
                     elif folder == 1:
                         if (array_one[i] > threshold) and (array_two[i] > threshold) and (
-                                array_three[i][j] < threshold):
+                                array_three[i][j] > threshold):
                             fn = fn + 1
                         else:
                             tp = tp + 1
@@ -444,7 +444,7 @@ def all_IM(array_one, array_two, array_three, selected_dataset, folder):
 
                     elif folder == 2:
                         if (array_one[i] > threshold) and (array_two[i] > threshold) and (
-                                array_three[i][j] < threshold):
+                                array_three[i][j] > threshold):
                             fn = fn + 1
                         else:
                             tp = tp + 1
