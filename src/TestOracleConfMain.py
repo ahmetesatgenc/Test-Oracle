@@ -40,25 +40,30 @@ def datasetSelect(dataset):
         selected_dataset = 2
     return main_folder, folder_dict, selected_dataset
 
-
 def main():
 
-    main_folder, folder_dict, selected_dataset = datasetSelect(dataset=1)
+    main_folder, folder_dict, selected_dataset = datasetSelect(dataset=2)
     a = 0
+    skip_allignment = False
     hist_enable = False
     temp_enable= False
     pix_enable = False
     feature_detector, descriptor_extractor, transformation, image_matching = get_Feature()
-    print "feature detector is: ", feature_detector
-    print "descriptor extractor is:", descriptor_extractor
-    print "transformation function is:", transformation
-    print "image matching algorithm is:", image_matching
-    feature_mapping = {'FAST':FAST_feature,'STAR':STAR_feature,'SIFT':SIFT_feature,'SURF':SURF_feature,'ORB':ORB_feature,
-                       'BRISK':BRISK_feature,'SimpleBlob':SIMPLEBLOB_feature}
-    descriptor_mapping = {'SIFT':SIFT_desc_extract,'SURF':SURF_desc_extract,'BRIEF':BRIEF_desc_extract,'BRISK':BRISK_desc_extract,
+    if (feature_detector is not None) or (descriptor_extractor is not None) or (transformation is not None):
+        print "feature detector is: ", feature_detector
+        print "descriptor extractor is:", descriptor_extractor
+        print "transformation function is:", transformation
+        print "image matching algorithm is:", image_matching
+        feature_mapping = {'FAST':FAST_feature,'STAR':STAR_feature,'SIFT':SIFT_feature,'SURF':SURF_feature,'ORB':ORB_feature,
+                       'BRISK':BRISK_feature,'MSER':MSER_feature,'SimpleBlob':SIMPLEBLOB_feature}
+        descriptor_mapping = {'SIFT':SIFT_desc_extract,'SURF':SURF_desc_extract,'BRIEF':BRIEF_desc_extract,'BRISK':BRISK_desc_extract,
                           'ORB':ORB_desc_extract,'FREAK':FREAK_desc_extract}
-    transformation_mapping = {'Affine Transform':Affine_transform, 'Perspective Transform':Perspective_transform}
-    image_matching_mapping = {'Histogram Matching':Histogram_matching,'Template Matching':Template_Matching,'Pixel Matching':Pixel_matching}
+        transformation_mapping = {'Affine Transform':Affine_transform, 'Perspective Transform':Perspective_transform}
+        image_matching_mapping = {'Histogram Matching':Histogram_matching,'Template Matching':Template_Matching,'Pixel Matching':Pixel_matching}
+        skip_allignment = False
+    else:
+        image_matching_mapping = {'Histogram Matching':Histogram_matching,'Template Matching':Template_Matching,'Pixel Matching':Pixel_matching}
+        skip_allignment = True
 
     if len(image_matching) is 1:
         if image_matching[0] == 'Histogram Matching':
@@ -90,15 +95,23 @@ def main():
         image_matching_2 = image_matching_mapping[image_matching[1]]
         image_matching_3 = image_matching_mapping[image_matching[2]]
 
-    if len(image_matching) is 3:
-        result_folder = './test_oracle_result/'+ 'dataset_'+str(selected_dataset)+'/'+feature_detector +'_'+ descriptor_extractor +'_'+ transformation +'_'+\
-                        image_matching[0]+'_'+image_matching[1]+'_'+image_matching[2]+'/'
-    elif len(image_matching) is 2:
-        result_folder = './test_oracle_result/'+'dataset_'+str(selected_dataset)+'/'+ feature_detector +'_'+ descriptor_extractor + '_'+transformation + '_'+\
-                    image_matching[0]+'_'+ image_matching[1]+'/'
+    if skip_allignment is False:
+        if len(image_matching) is 3:
+            result_folder = './test_oracle_result/'+ 'dataset_'+str(selected_dataset)+'/'+feature_detector +'_'+ descriptor_extractor +'_'+ transformation +'_'+\
+                            image_matching[0]+'_'+image_matching[1]+'_'+image_matching[2]+'/'
+        elif len(image_matching) is 2:
+            result_folder = './test_oracle_result/'+'dataset_'+str(selected_dataset)+'/'+ feature_detector +'_'+ descriptor_extractor + '_'+transformation + '_'+\
+                        image_matching[0]+'_'+ image_matching[1]+'/'
+        else:
+            result_folder = './test_oracle_result/' + 'dataset_'+str(selected_dataset)+'/'+ feature_detector + '_'+descriptor_extractor +'_'+ transformation +'_'+ \
+                        image_matching[0]+'/'
     else:
-        result_folder = './test_oracle_result/' + 'dataset_'+str(selected_dataset)+'/'+ feature_detector + '_'+descriptor_extractor +'_'+ transformation +'_'+ \
-                    image_matching[0]+'/'
+        if len(image_matching) is 3:
+            result_folder = './test_oracle_result/'+ 'dataset_'+str(selected_dataset)+'/'+ image_matching[0]+'_'+image_matching[1]+'_'+image_matching[2]+'/'
+        elif len(image_matching) is 2:
+            result_folder = './test_oracle_result/'+'dataset_'+str(selected_dataset)+'/'+image_matching[0]+'_'+ image_matching[1]+'/'
+        else:
+            result_folder = './test_oracle_result/' + 'dataset_'+str(selected_dataset)+'/'+image_matching[0]+'/'
 
     if not os.path.exists(result_folder):
         os.makedirs(result_folder)
@@ -107,9 +120,11 @@ def main():
         for f in files:
             os.remove(f)
 
-    feature_detector = feature_mapping[feature_detector]
-    descriptor_extractor = descriptor_mapping[descriptor_extractor]
-    transformation = transformation_mapping[transformation]
+    if skip_allignment is False:
+        feature_detector = feature_mapping[feature_detector]
+        descriptor_extractor = descriptor_mapping[descriptor_extractor]
+        transformation = transformation_mapping[transformation]
+
     # with open(main_folder + "result/" + "result" + ".txt", "w") as file:
     #    file.close()
 
@@ -126,25 +141,31 @@ def main():
         for image in range(1, image_count[a] + 1, 1):
 
             folder_count_array.append(image)
+            if selected_dataset == 1:
+                img_grab, img_ref = load_images_from_folder(main_folder + folder_name[a] + '/' + str(image) + '/')
 
-            img_grab, img_ref = load_images_from_folder(main_folder + folder_name[a] + '/' + str(image) + '/')
-            #kp_grab, des_grab = featureDetector(img_grab)
-            #kp_ref, des_ref = featureDetector(img_ref)
-            kp_grab = feature_detector(img_grab)
-            kp_grab, des_grab = descriptor_extractor(img_grab,kp_grab)
-            kp_grab_array.append(len(kp_grab))
-            kp_ref = feature_detector(img_ref)
-            kp_ref, des_ref = descriptor_extractor(img_ref,kp_ref)
-            kp_ref_array.append(len(kp_ref))
+            elif selected_dataset == 2:
+                image_name = main_folder + folder_name[a] + '/'
+                img_grab, img_ref = load_images_from_folder(main_folder + folder_name[a] + '/' + str(image) + '/')
 
-            if kp_ref is not None and kp_grab is not None and des_grab is not None and des_ref is not None:
+            if skip_allignment is False:
+                kp_grab = feature_detector(img_grab)
+                kp_grab, des_grab = descriptor_extractor(img_grab,kp_grab)
+                kp_grab_array.append(len(kp_grab))
+                kp_ref = feature_detector(img_ref)
+                kp_ref, des_ref = descriptor_extractor(img_ref,kp_ref)
+                kp_ref_array.append(len(kp_ref))
 
-                matches, goodMatches = BFmatcher(des_grab, des_ref)
-                goodMatches_array.append(len(goodMatches))
-                if len(goodMatches):
-                    warpedImage = transformation(kp_grab, kp_ref, img_grab, goodMatches)
+                if kp_ref is not None and kp_grab is not None and des_grab is not None and des_ref is not None:
+                    matches, goodMatches = BFmatcher(des_grab, des_ref)
+                    goodMatches_array.append(len(goodMatches))
+                    if len(goodMatches):
+                        warpedImage = transformation(kp_grab, kp_ref, img_grab, goodMatches)
+                else:
+                    goodMatches_array.append(0)
+
             else:
-                goodMatches_array.append(0)
+                warpedImage = img_grab
 
             if hist_enable is True:
                 hist_result = image_matching_1(img_ref, warpedImage)
@@ -217,17 +238,18 @@ def main():
             plot_Graph(pixel_comp_array, folder_count_array, 1.1, max(folder_count_array) + 1, result_folder + 'Pixel_Matching_' + folder_name[folder - 1]+ '.png',
                   'Pixel Accuracy', 'Images')
 
-        plot_Graph(kp_grab_array, folder_count_array, max(kp_grab_array)+100, max(folder_count_array) + 1, result_folder + 'Grabbed Key Points_' + folder_name[folder - 1]+ '.png',
-                'Grabbed Image Key Points', 'Images')
+        if skip_allignment is False:
+            plot_Graph(kp_grab_array, folder_count_array, max(kp_grab_array)+100, max(folder_count_array) + 1, result_folder + 'Grabbed Key Points_' + folder_name[folder - 1]+ '.png',
+                    'Grabbed Image Key Points', 'Images')
 
-        plot_Graph(kp_ref_array, folder_count_array, max(kp_ref_array)+100, max(folder_count_array) + 1, result_folder + 'Ref Key Points_' + folder_name[folder - 1]+ '.png',
-                'Ref Image Key Points', 'Images')
+            plot_Graph(kp_ref_array, folder_count_array, max(kp_ref_array)+100, max(folder_count_array) + 1, result_folder + 'Ref Key Points_' + folder_name[folder - 1]+ '.png',
+                    'Ref Image Key Points', 'Images')
 
-        plot_Graph(goodMatches_array, folder_count_array, max(goodMatches_array)+100, max(folder_count_array) + 1, result_folder + 'GoodMatches_' + folder_name[folder - 1]+ '.png',
-                'Good Matches', 'Images')
+            plot_Graph(goodMatches_array, folder_count_array, max(goodMatches_array)+100, max(folder_count_array) + 1, result_folder + 'GoodMatches_' + folder_name[folder - 1]+ '.png',
+                    'Good Matches', 'Images')
 
-        plot_Graph(kp_grab_array, goodMatches_array, max(kp_grab_array)+100, max(goodMatches_array) + 100, result_folder + 'kp_vs_GoodMatches_' + folder_name[folder - 1]+ '.png',
-                'Grabbed Key Points', 'Good Matches')
+            plot_Graph(kp_grab_array, goodMatches_array, max(kp_grab_array)+100, max(goodMatches_array) + 100, result_folder + 'kp_vs_GoodMatches_' + folder_name[folder - 1]+ '.png',
+                    'Grabbed Key Points', 'Good Matches')
 
 
         if hist_enable and temp_enable and pix_enable is True:
