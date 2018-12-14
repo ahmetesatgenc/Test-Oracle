@@ -10,9 +10,23 @@ from f_Score import f_score
 from plotGraph import plot_Graph
 from boxPlot import box_plot
 from readConfig import get_Feature
-
+from crossValidation import  crossValidation
+from sklearn.model_selection import KFold
 
 np.set_printoptions(threshold='nan')
+
+fp_array_1_split = [];
+tn_array_1_split = [];
+fn_array_2_split = [];
+tp_array_2_split = [];
+fp_array_3_split = [];
+tn_array_3_split = [];
+fp_array_4_split = [];
+tn_array_4_split = []
+test_index_cv = []
+hist_matching_array_test = []
+pixel_comp_array_test = []
+template_matching_array_test = []
 
 def load_images_from_folder(folder):
     grab_name = "grab.png"
@@ -26,6 +40,75 @@ def load_images_from_folder(folder):
             img_ref = cv2.imread(os.path.join(folder, filename))
     return img_grab, img_ref
 
+def load_images_direct(folder, selected_folder, image):
+    if selected_folder == 'COL_SAT_ALL':
+        if image < 10:
+            grab_name = "cs_" + "00" + str(image) + "-g.png"
+            img_grab = cv2.imread(os.path.join(folder, grab_name))
+            ref_name = "cs_" + "00" + str(image) + "-r.png"
+            img_ref = cv2.imread(os.path.join(folder, ref_name))
+        elif image < 100:
+            grab_name = "cs_" + "0" + str(image) + "-g.png"
+            img_grab = cv2.imread(os.path.join(folder, grab_name))
+            ref_name = "cs_" + "0" + str(image) + "-r.png"
+            img_ref = cv2.imread(os.path.join(folder, ref_name))
+        else:
+            grab_name = "cs_" + str(image) + "-g.png"
+            img_grab = cv2.imread(os.path.join(folder, grab_name))
+            ref_name = "cs_" + str(image) + "-r.png"
+            img_ref = cv2.imread(os.path.join(folder, ref_name))
+    elif selected_folder == 'FAIL_ALL':
+        if image < 10:
+            grab_name = "f_" + "00" + str(image) + "-g.png"
+            img_grab = cv2.imread(os.path.join(folder, grab_name))
+            ref_name = "f_" + "00" + str(image) + "-r.png"
+            img_ref = cv2.imread(os.path.join(folder, ref_name))
+        elif image < 100:
+            grab_name = "f_" + "0" + str(image) + "-g.png"
+            img_grab = cv2.imread(os.path.join(folder, grab_name))
+            ref_name = "f_" + "0" + str(image) + "-r.png"
+            img_ref = cv2.imread(os.path.join(folder, ref_name))
+        else:
+            grab_name = "f_" + str(image) + "-g.png"
+            img_grab = cv2.imread(os.path.join(folder, grab_name))
+            ref_name = "f_" + str(image) + "-r.png"
+            img_ref = cv2.imread(os.path.join(folder, ref_name))
+    elif selected_folder == 'PIX_SHF_ALL':
+        if image < 10:
+            grab_name = "ps_" + "00" + str(image) + "-g.png"
+            img_grab = cv2.imread(os.path.join(folder, grab_name))
+            ref_name = "ps_" + "00" + str(image) + "-r.png"
+            img_ref = cv2.imread(os.path.join(folder, ref_name))
+        elif image < 100:
+            grab_name = "ps_" + "0" + str(image) + "-g.png"
+            img_grab = cv2.imread(os.path.join(folder, grab_name))
+            ref_name = "ps_" + "0" + str(image) + "-r.png"
+            img_ref = cv2.imread(os.path.join(folder, ref_name))
+        else:
+            grab_name = "ps_" + str(image) + "-g.png"
+            img_grab = cv2.imread(os.path.join(folder, grab_name))
+            ref_name = "ps_" + str(image) + "-r.png"
+            img_ref = cv2.imread(os.path.join(folder, ref_name))
+    elif selected_folder == 'SCL_ALL':
+        if image < 10:
+            grab_name = "s_" + "00" + str(image) + "-g.png"
+            img_grab = cv2.imread(os.path.join(folder, grab_name))
+            ref_name = "s_" + "00" + str(image) + "-r.png"
+            img_ref = cv2.imread(os.path.join(folder, ref_name))
+        elif image < 100:
+            grab_name = "s_" + "0" + str(image) + "-g.png"
+            img_grab = cv2.imread(os.path.join(folder, grab_name))
+            ref_name = "s_" + "0" + str(image) + "-r.png"
+            img_ref = cv2.imread(os.path.join(folder, ref_name))
+        else:
+            grab_name = "s_" + str(image) + "-g.png"
+            img_grab = cv2.imread(os.path.join(folder, grab_name))
+            ref_name = "s_" + str(image) + "-r.png"
+            img_ref = cv2.imread(os.path.join(folder, ref_name))
+    print "file name:", os.path.join(folder, grab_name)
+    print "file name:", os.path.join(folder, ref_name)
+    return img_grab, img_ref
+
 def datasetSelect(dataset):
     if dataset == 1:
         main_folder = './sample_images/dataset_1/'
@@ -35,8 +118,8 @@ def datasetSelect(dataset):
     elif dataset == 2:
         main_folder = './sample_images/dataset_2/'
         folder_list = os.listdir(main_folder)
-        folder_dict = {folder_list[0]: 5, folder_list[1]: 5, folder_list[2]: 5,
-                       folder_list[3]: 5}
+        folder_dict = {folder_list[0]: 143, folder_list[1]: 456, folder_list[2]: 42,
+                       folder_list[3]: 359} # 143,456,42,359
         selected_dataset = 2
     return main_folder, folder_dict, selected_dataset
 
@@ -143,10 +226,13 @@ def main():
             folder_count_array.append(image)
             if selected_dataset == 1:
                 img_grab, img_ref = load_images_from_folder(main_folder + folder_name[a] + '/' + str(image) + '/')
-
+                # print img_ref
+                # print img_grab
             elif selected_dataset == 2:
                 image_name = main_folder + folder_name[a] + '/'
-                img_grab, img_ref = load_images_from_folder(main_folder + folder_name[a] + '/' + str(image) + '/')
+                img_grab, img_ref = load_images_direct(image_name, folder_name[a], image)
+                # print img_ref
+                # print img_grab
 
             if skip_allignment is False:
                 kp_grab = feature_detector(img_grab)
@@ -184,45 +270,6 @@ def main():
             #pixel_comp_array = [(1 - float(i) / max(pixel_comp_array)) for i in pixel_comp_array]
             pixel_comp_array = pixel_comp_array.tolist()
             print pixel_comp_array
-        if selected_dataset == 1:
-            if hist_enable and temp_enable and pix_enable is True:
-                fp_sat_array_all, tn_sat_array_all, fn_fail_array_all, tp_fail_array_all = all_IM(
-                    hist_matching_array, pixel_comp_array, template_matching_array, selected_dataset, folder)
-            elif (hist_enable is True and pix_enable is True) and temp_enable is False:
-                fp_sat_array_hp, tn_sat_array_hp, fn_fail_array_hp, tp_fail_array_hp = two_IM(hist_matching_array, pixel_comp_array, selected_dataset, folder)
-            elif (hist_enable is True and temp_enable is True) and pix_enable is False:
-               fp_sat_array_ht, tn_sat_array_ht, fn_fail_array_ht, tp_fail_array_ht = two_IM(hist_matching_array, template_matching_array, selected_dataset, folder)
-            elif (pix_enable is True and temp_enable is True) and hist_enable is False:
-                fp_sat_array_tp, tn_sat_array_tp, fn_fail_array_tp, tp_fail_array_tp = two_IM(template_matching_array, pixel_comp_array, selected_dataset, folder)
-            elif hist_enable is True and (pix_enable is False and temp_enable is False):
-                fp_sat_array_h, tn_sat_array_h, fn_fail_array_h, tp_fail_array_h = one_IM(hist_matching_array,selected_dataset, folder)
-            elif temp_enable is True and (pix_enable is False and temp_enable is False):
-                fp_sat_array_t, tn_sat_array_t, fn_fail_array_t, tp_fail_array_t = one_IM(template_matching_array, selected_dataset, folder)
-            elif pix_enable is True and (hist_enable is False and temp_enable is False):
-                fp_sat_array_p, tn_sat_array_p, fn_fail_array_p, tp_fail_array_p = one_IM(pixel_comp_array, selected_dataset, folder)
-
-        elif selected_dataset == 2:
-            if hist_enable and temp_enable and pix_enable is True:
-                fp_array_1_all, tn_array_1_all, fn_array_2_all, tp_array_2_all, fp_array_3_all, tn_array_3_all, fp_array_4_all, tn_array_4_all = all_IM(
-                    hist_matching_array, pixel_comp_array, template_matching_array, selected_dataset, folder)
-            elif (hist_enable is True and pix_enable is True) and temp_enable is False:
-                fp_array_1_hp, tn_array_1_hp, fn_array_2_hp, tp_array_2_hp, fp_array_3_hp, tn_array_3_hp, fp_array_4_hp, tn_array_4_hp = two_IM(
-                    hist_matching_array, pixel_comp_array,selected_dataset, folder)
-            elif (hist_enable is True and temp_enable is True) and pix_enable is False:
-                fp_array_1_ht, tn_array_1_ht, fn_array_2_ht, tp_array_2_ht, fp_array_3_ht, tn_array_3_ht, fp_array_4_ht, tn_array_4_ht = two_IM(
-                    hist_matching_array, template_matching_array, selected_dataset, folder)
-            elif (pix_enable is True and temp_enable is True) and hist_enable is False:
-                fp_array_1_tp, tn_array_1_tp, fn_array_2_tp, tp_array_2_tp, fp_array_3_tp, tn_array_3_tp, fp_array_4_tp, tn_array_4_tp = two_IM(
-                    template_matching_array, pixel_comp_array, selected_dataset, folder)
-            elif hist_enable is True and (temp_enable is False and pix_enable is False):
-                fp_array_1_h, tn_array_1_h, fn_array_2_h, tp_array_2_h, fp_array_3_h, tn_array_3_h, fp_array_4_h, tn_array_4_h = one_IM(
-                    hist_matching_array, selected_dataset, folder)
-            elif temp_enable is True and (hist_enable is False and pix_enable is False):
-                fp_array_1_t, tn_array_1_t, fn_array_2_t, tp_array_2_t, fp_array_3_t, tn_array_3_t, fp_array_4_t, tn_array_4_t = one_IM(
-                    template_matching_array, selected_dataset, folder)
-            elif pix_enable is True and (temp_enable is False and hist_enable is False):
-                fp_array_1_p, tn_array_1_p, fn_array_2_p, tp_array_2_p, fp_array_3_p, tn_array_3_p, fp_array_4_p, tn_array_4_p = one_IM(
-                    pixel_comp_array, selected_dataset, folder)
 
         if hist_enable is True:
             plot_Graph(hist_matching_array, folder_count_array, 1.1, max(folder_count_array) + 1,
@@ -274,64 +321,147 @@ def main():
             box_plot(None, pixel_comp_array, None, result_folder + 'BoxPlot_p' +
                  '-' + folder_name[folder - 1] +'.png')
 
+        kf = KFold(n_splits= 10)
+
+        for train_index, test_index in kf.split(image_count):
+            print("TRAIN:", train_index, "TEST:", test_index)
+            test_index_cv.append(train_index)
+            hist_matching_array_test.append(hist_matching_array[test_index[0]:test_index[len(test_index)-1]+1])
+            pixel_comp_array_test.append(pixel_comp_array[test_index[0]:test_index[len(test_index)-1]+1])
+            template_matching_array_test.append(template_matching_array[:][test_index[0]:test_index[len(test_index)-1]+1])
+            hist_matching_array_train = hist_matching_array[train_index[0]:train_index[len(train_index)-1]+1]
+            pixel_comp_array_train = pixel_comp_array[train_index[0]:train_index[len(train_index)-1]+1]
+            template_matching_array_train = template_matching_array[:][train_index[0]:train_index[len(train_index)-1]+1]
+
+            if selected_dataset == 1:
+                if hist_enable and temp_enable and pix_enable is True:
+                    fp_sat_array_all, tn_sat_array_all, fn_fail_array_all, tp_fail_array_all = all_IM(
+                        hist_matching_array_train, pixel_comp_array_train, template_matching_array_train, selected_dataset, folder)
+                elif (hist_enable is True and pix_enable is True) and temp_enable is False:
+                    fp_sat_array_hp, tn_sat_array_hp, fn_fail_array_hp, tp_fail_array_hp = two_IM(hist_matching_array_train, pixel_comp_array_train, selected_dataset, folder)
+                elif (hist_enable is True and temp_enable is True) and pix_enable is False:
+                   fp_sat_array_ht, tn_sat_array_ht, fn_fail_array_ht, tp_fail_array_ht = two_IM(hist_matching_array_train, template_matching_array_train, selected_dataset, folder)
+                elif (pix_enable is True and temp_enable is True) and hist_enable is False:
+                    fp_sat_array_tp, tn_sat_array_tp, fn_fail_array_tp, tp_fail_array_tp = two_IM(template_matching_array_train, pixel_comp_array_train, selected_dataset, folder)
+                elif hist_enable is True and (pix_enable is False and temp_enable is False):
+                    fp_sat_array_h, tn_sat_array_h, fn_fail_array_h, tp_fail_array_h = one_IM(hist_matching_array_train,selected_dataset, folder)
+                elif temp_enable is True and (pix_enable is False and temp_enable is False):
+                    fp_sat_array_t, tn_sat_array_t, fn_fail_array_t, tp_fail_array_t = one_IM(template_matching_array_train, selected_dataset, folder)
+                elif pix_enable is True and (hist_enable is False and temp_enable is False):
+                    fp_sat_array_p, tn_sat_array_p, fn_fail_array_p, tp_fail_array_p = one_IM(pixel_comp_array_train, selected_dataset, folder)
+
+            elif selected_dataset == 2:
+                if hist_enable and temp_enable and pix_enable is True:
+                    fp_array_1_all, tn_array_1_all, fn_array_2_all, tp_array_2_all, fp_array_3_all, tn_array_3_all, fp_array_4_all, tn_array_4_all = all_IM(
+                        hist_matching_array_train, pixel_comp_array_train, template_matching_array_train, selected_dataset, folder)
+                    if folder ==1: fp_array_1_split.append(fp_array_1_all);tn_array_1_split.append(tn_array_1_all);
+                    if folder==2:fn_array_2_split.append(fn_array_2_all);tp_array_2_split.append(tp_array_2_all)
+                    if folder==3:fp_array_3_split.append(fp_array_3_all);tn_array_3_split.append(tn_array_3_all);
+                    if folder==4:fp_array_4_split.append(fp_array_4_all);tn_array_4_split.append(tn_array_4_all)
+                elif (hist_enable is True and pix_enable is True) and temp_enable is False:
+                    fp_array_1_hp, tn_array_1_hp, fn_array_2_hp, tp_array_2_hp, fp_array_3_hp, tn_array_3_hp, fp_array_4_hp, tn_array_4_hp = two_IM(
+                        hist_matching_array_train, pixel_comp_array_train,selected_dataset, folder)
+                    if folder == 1:fp_array_1_split.append(fp_array_1_hp);tn_array_1_split.append(tn_array_1_hp);
+                    if folder == 2:fn_array_2_split.append(fn_array_2_hp);tp_array_2_split.append(tp_array_2_hp)
+                    if folder == 3:fp_array_3_split.append(fp_array_3_hp);tn_array_3_split.append(tn_array_3_hp);
+                    if folder == 4:fp_array_4_split.append(fp_array_4_hp);tn_array_4_split.append(tn_array_4_hp)
+                elif (hist_enable is True and temp_enable is True) and pix_enable is False:
+                    fp_array_1_ht, tn_array_1_ht, fn_array_2_ht, tp_array_2_ht, fp_array_3_ht, tn_array_3_ht, fp_array_4_ht, tn_array_4_ht = two_IM(
+                        hist_matching_array_train, template_matching_array_train, selected_dataset, folder)
+                    if folder == 1:fp_array_1_split.append(fp_array_1_ht);tn_array_1_split.append(tn_array_1_ht);
+                    if folder == 2:fn_array_2_split.append(fn_array_2_ht);tp_array_2_split.append(tp_array_2_ht)
+                    if folder == 3:fp_array_3_split.append(fp_array_3_ht);tn_array_3_split.append(tn_array_3_ht);
+                    if folder == 4:fp_array_4_split.append(fp_array_4_ht);tn_array_4_split.append(tn_array_4_ht)
+                elif (pix_enable is True and temp_enable is True) and hist_enable is False:
+                    fp_array_1_tp, tn_array_1_tp, fn_array_2_tp, tp_array_2_tp, fp_array_3_tp, tn_array_3_tp, fp_array_4_tp, tn_array_4_tp = two_IM(
+                        template_matching_array_train, pixel_comp_array_train, selected_dataset, folder)
+                    if folder == 1:fp_array_1_split.append(fp_array_1_tp);tn_array_1_split.append(tn_array_1_tp);
+                    if folder == 2:fn_array_2_split.append(fn_array_2_tp);tp_array_2_split.append(tp_array_2_tp)
+                    if folder == 3:fp_array_3_split.append(fp_array_3_tp);tn_array_3_split.append(tn_array_3_tp);
+                    if folder == 4:fp_array_4_split.append(fp_array_4_tp);tn_array_4_split.append(tn_array_4_tp)
+                elif hist_enable is True and (temp_enable is False and pix_enable is False):
+                    fp_array_1_h, tn_array_1_h, fn_array_2_h, tp_array_2_h, fp_array_3_h, tn_array_3_h, fp_array_4_h, tn_array_4_h = one_IM(
+                        hist_matching_array_train, selected_dataset, folder)
+                    if folder == 1:fp_array_1_split.append(fp_array_1_h);tn_array_1_split.append(tn_array_1_h);
+                    if folder == 2:fn_array_2_split.append(fn_array_2_h);tp_array_2_split.append(tp_array_2_h)
+                    if folder == 3:fp_array_3_split.append(fp_array_3_h);tn_array_3_split.append(tn_array_3_h);
+                    if folder == 4:fp_array_4_split.append(fp_array_4_h);tn_array_4_split.append(tn_array_4_h)
+                elif temp_enable is True and (hist_enable is False and pix_enable is False):
+                    fp_array_1_t, tn_array_1_t, fn_array_2_t, tp_array_2_t, fp_array_3_t, tn_array_3_t, fp_array_4_t, tn_array_4_t = one_IM(
+                        template_matching_array_train, selected_dataset, folder)
+                    if folder == 1:fp_array_1_split.append(fp_array_1_t);tn_array_1_split.append(tn_array_1_t);
+                    if folder == 2:fn_array_2_split.append(fn_array_2_t);tp_array_2_split.append(tp_array_2_t)
+                    if folder == 3:fp_array_3_split.append(fp_array_3_t);tn_array_3_split.append(tn_array_3_t);
+                    if folder == 4:fp_array_4_split.append(fp_array_4_t);tn_array_4_split.append(tn_array_4_t)
+                elif pix_enable is True and (temp_enable is False and hist_enable is False):
+                    fp_array_1_p, tn_array_1_p, fn_array_2_p, tp_array_2_p, fp_array_3_p, tn_array_3_p, fp_array_4_p, tn_array_4_p = one_IM(
+                        pixel_comp_array_train, selected_dataset, folder)
+                    if folder == 1:fp_array_1_split.append(fp_array_1_p);tn_array_1_split.append(tn_array_1_p);
+                    if folder == 2:fn_array_2_split.append(fn_array_2_p);tp_array_2_split.append(tp_array_2_p)
+                    if folder == 3:fp_array_3_split.append(fp_array_3_p);tn_array_3_split.append(tn_array_3_p);
+                    if folder == 4:fp_array_4_split.append(fp_array_4_p);tn_array_4_split.append(tn_array_4_p)
+
     if selected_dataset == 1:
         if hist_enable and temp_enable and pix_enable is True:
-            f1_score_calc_array_all, f2_score_calc_array_all, f05_score_calc_array_all, threshold_array_all, precision_array_all, recall_array_all, sensitivity_array_all, specificity_fn_array_all, accuracy_array_all = f_score(
+            f1_score_calc_array_all, f2_score_calc_array_all, f05_score_calc_array_all, threshold_array_all, precision_array_all, recall_array_all, sensitivity_array_all, specificity_fn_array_all, accuracy_array_all, max_index_1_av,max_index_2_av,max_index_05_av = f_score(
                 fp_sat_array_all, tn_sat_array_all, fn_fail_array_all, tp_fail_array_all, None, None, None, None,
-                selected_dataset, image_count, 'all',result_folder,temp_enable)
+                selected_dataset, image_count, 'all',result_folder,temp_enable,kf.n_splits)
         elif (hist_enable is True and pix_enable is True) and temp_enable is False:
-            f1_score_calc_array_hp, f2_score_calc_array_hp, f05_score_calc_array_hp, threshold_array_hp, precision_array_hp, recall_array_hp, sensitivity_array_hp, specificity_fn_array_hp, accuracy_array_hp = f_score(
+            f1_score_calc_array_hp, f2_score_calc_array_hp, f05_score_calc_array_hp, threshold_array_hp, precision_array_hp, recall_array_hp, sensitivity_array_hp, specificity_fn_array_hp, accuracy_array_hp, max_index_1_av,max_index_2_av,max_index_05_av= f_score(
                 fp_sat_array_hp, tn_sat_array_hp, fn_fail_array_hp, tp_fail_array_hp, None, None, None, None,
-                selected_dataset, image_count, 'histogram_pixel',result_folder,temp_enable)
+                selected_dataset, image_count, 'histogram_pixel',result_folder,temp_enable,kf.n_splits)
         elif (hist_enable is True and temp_enable is True) and pix_enable is False:
-            f1_score_calc_array_ht, f2_score_calc_array_ht, f05_score_calc_array_ht, threshold_array_ht, precision_array_ht, recall_array_ht, sensitivity_array_ht, specificity_fn_array_ht, accuracy_array_ht = f_score(
+            f1_score_calc_array_ht, f2_score_calc_array_ht, f05_score_calc_array_ht, threshold_array_ht, precision_array_ht, recall_array_ht, sensitivity_array_ht, specificity_fn_array_ht, accuracy_array_ht, max_index_1_av,max_index_2_av,max_index_05_av = f_score(
                 fp_sat_array_ht, tn_sat_array_ht, fn_fail_array_ht, tp_fail_array_ht, None, None, None, None,
-                selected_dataset, image_count, 'histogram_template',result_folder,temp_enable)
+                selected_dataset, image_count, 'histogram_template',result_folder,temp_enable,kf.n_splits)
         elif (temp_enable is True and pix_enable is True) and hist_enable is False:
-            f1_score_calc_array_tp, f2_score_calc_array_tp, f05_score_calc_array_tp, threshold_array_tp, precision_array_tp, recall_array_tp, sensitivity_array_tp, specificity_fn_array_tp, accuracy_array_tp = f_score(
+            f1_score_calc_array_tp, f2_score_calc_array_tp, f05_score_calc_array_tp, threshold_array_tp, precision_array_tp, recall_array_tp, sensitivity_array_tp, specificity_fn_array_tp, accuracy_array_tp, max_index_1_av,max_index_2_av,max_index_05_av = f_score(
                 fp_sat_array_tp, tn_sat_array_tp, fn_fail_array_tp, tp_fail_array_tp, None, None, None, None,
-                selected_dataset, image_count, 'pixel_template',result_folder,temp_enable)
+                selected_dataset, image_count, 'pixel_template',result_folder,temp_enable,kf.n_splits)
         elif hist_enable is True and (pix_enable is False and temp_enable is False):
-            f1_score_calc_array_h, f2_score_calc_array_h, f05_score_calc_array_h, threshold_array_h, precision_array_h, recall_array_h, sensitivity_array_h, specificity_fn_array_h, accuracy_array_h = f_score(
+            f1_score_calc_array_h, f2_score_calc_array_h, f05_score_calc_array_h, threshold_array_h, precision_array_h, recall_array_h, sensitivity_array_h, specificity_fn_array_h, accuracy_array_h, max_index_1_av,max_index_2_av,max_index_05_av = f_score(
                 fp_sat_array_h, tn_sat_array_h, fn_fail_array_h, tp_fail_array_h, None, None, None, None, selected_dataset,
-                image_count, 'histogram',result_folder,temp_enable)
+                image_count, 'histogram',result_folder,temp_enable,kf.n_splits)
         elif temp_enable is True and (pix_enable is False and hist_enable is False):
-            f1_score_calc_array_t, f2_score_calc_array_t, f05_score_calc_array_t, threshold_array_t, precision_array_t, recall_array_t, sensitivity_array_t, specificity_fn_array_t, accuracy_array_t = f_score(
+            f1_score_calc_array_t, f2_score_calc_array_t, f05_score_calc_array_t, threshold_array_t, precision_array_t, recall_array_t, sensitivity_array_t, specificity_fn_array_t, accuracy_array_t, max_index_1_av,max_index_2_av,max_index_05_av = f_score(
                 fp_sat_array_t, tn_sat_array_t, fn_fail_array_t, tp_fail_array_t, None, None, None, None, selected_dataset,
-                image_count, 'template',result_folder,temp_enable)
+                image_count, 'template',result_folder,temp_enable,kf.n_splits)
         elif pix_enable is True and (temp_enable is False and hist_enable is False):
-            f1_score_calc_array_p, f2_score_calc_array_p, f05_score_calc_array_p, threshold_array_p, precision_array_p, recall_array_p, sensitivity_array_p, specificity_fn_array_p, accuracy_array_p = f_score(
+            f1_score_calc_array_p, f2_score_calc_array_p, f05_score_calc_array_p, threshold_array_p, precision_array_p, recall_array_p, sensitivity_array_p, specificity_fn_array_p, accuracy_array_p, max_index_1_av,max_index_2_av,max_index_05_av = f_score(
                 fp_sat_array_p, tn_sat_array_p, fn_fail_array_p, tp_fail_array_p, None, None, None, None, selected_dataset,
-                image_count, 'pixel',result_folder,temp_enable)
+                image_count, 'pixel',result_folder,temp_enable,kf.n_splits)
     elif selected_dataset == 2:
         if hist_enable and temp_enable and pix_enable is True:
-            f1_score_calc_array_all, f2_score_calc_array_all, f05_score_calc_array_all, threshold_array_all, precision_array_all, recall_array_all, sensitivity_array_all, specificity_fn_array_all, accuracy_array_all = f_score(
-                fp_array_1_all, tn_array_1_all, fn_array_2_all, tp_array_2_all, fp_array_3_all, tn_array_3_all,
-                fp_array_4_all, tn_array_4_all, selected_dataset, image_count, 'all',result_folder,temp_enable)
+            f1_score_calc_array_all, f2_score_calc_array_all, f05_score_calc_array_all, threshold_array_all, precision_array_all, recall_array_all, sensitivity_array_all, specificity_fn_array_all, accuracy_array_all, max_index_1_av,max_index_2_av,max_index_05_av = f_score(
+                fp_array_1_split, tn_array_1_split, fn_array_2_split, tp_array_2_split, fp_array_3_split, tn_array_3_split,
+                fp_array_4_split, tn_array_4_split, selected_dataset, image_count, 'all',result_folder,temp_enable,kf.n_splits,test_index_cv)
         elif (hist_enable is True and pix_enable is True) and temp_enable is False:
-            f1_score_calc_array_hp, f2_score_calc_array_hp, f05_score_calc_array_hp, threshold_array_hp, precision_array_hp, recall_array_hp, sensitivity_array_hp, specificity_fn_array_hp, accuracy_array_hp = f_score(
-                fp_array_1_hp, tn_array_1_hp, fn_array_2_hp, tp_array_2_hp, fp_array_3_hp, tn_array_3_hp, fp_array_4_hp,
-                tn_array_4_hp, selected_dataset, image_count, 'histogram_pixel',result_folder,temp_enable)
+            f1_score_calc_array_hp, f2_score_calc_array_hp, f05_score_calc_array_hp, threshold_array_hp, precision_array_hp, recall_array_hp, sensitivity_array_hp, specificity_fn_array_hp, accuracy_array_hp, max_index_1_av,max_index_2_av,max_index_05_av = f_score(
+                fp_array_1_split, tn_array_1_split, fn_array_2_split, tp_array_2_split, fp_array_3_split,
+                tn_array_3_split, fp_array_4_split, tn_array_4_split, selected_dataset, image_count, 'histogram_pixel',result_folder,temp_enable,kf.n_splits,test_index_cv)
         elif (hist_enable is True and temp_enable is True) and pix_enable is False:
-            f1_score_calc_array_ht, f2_score_calc_array_ht, f05_score_calc_array_ht, threshold_array_ht, precision_array_ht, recall_array_ht, sensitivity_array_ht, specificity_fn_array_ht, accuracy_array_ht = f_score(
-                fp_array_1_ht, tn_array_1_ht, fn_array_2_ht, tp_array_2_ht, fp_array_3_ht, tn_array_3_ht, fp_array_4_ht,
-                tn_array_4_ht, selected_dataset, image_count, 'histogram_template',result_folder,temp_enable)
+            f1_score_calc_array_ht, f2_score_calc_array_ht, f05_score_calc_array_ht, threshold_array_ht, precision_array_ht, recall_array_ht, sensitivity_array_ht, specificity_fn_array_ht, accuracy_array_ht, max_index_1_av,max_index_2_av,max_index_05_av = f_score(
+                fp_array_1_split, tn_array_1_split, fn_array_2_split, tp_array_2_split, fp_array_3_split,tn_array_3_split,
+                fp_array_4_split, tn_array_4_split, selected_dataset, image_count, 'histogram_template',result_folder,temp_enable,kf.n_splits,test_index_cv)
         elif (temp_enable is True and pix_enable is True) and hist_enable is False:
-            f1_score_calc_array_tp, f2_score_calc_array_tp, f05_score_calc_array_tp, threshold_array_tp, precision_array_tp, recall_array_tp, sensitivity_array_tp, specificity_fn_array_tp, accuracy_array_tp = f_score(
-                fp_array_1_tp, tn_array_1_tp, fn_array_2_tp, tp_array_2_tp, fp_array_3_tp, tn_array_3_tp, fp_array_4_tp,
-                tn_array_4_tp, selected_dataset, image_count, 'pixel_template',result_folder,temp_enable)
+            f1_score_calc_array_tp, f2_score_calc_array_tp, f05_score_calc_array_tp, threshold_array_tp, precision_array_tp, recall_array_tp, sensitivity_array_tp, specificity_fn_array_tp, accuracy_array_tp, max_index_1_av,max_index_2_av,max_index_05_av = f_score(
+                fp_array_1_split, tn_array_1_split, fn_array_2_split, tp_array_2_split, fp_array_3_split,tn_array_3_split,
+                fp_array_4_split, tn_array_4_split, selected_dataset, image_count, 'pixel_template',result_folder,temp_enable,kf.n_splits,test_index_cv)
         elif hist_enable is True and (temp_enable is False and pix_enable is False):
-            f1_score_calc_array_h, f2_score_calc_array_h, f05_score_calc_array_h, threshold_array_h, precision_array_h, recall_array_h, sensitivity_array_h, specificity_fn_array_h, accuracy_array_h = f_score(
-                fp_array_1_h, tn_array_1_h, fn_array_2_h, tp_array_2_h, fp_array_3_h, tn_array_3_h, fp_array_4_h,
-                tn_array_4_h, selected_dataset, image_count, 'histogram',result_folder,temp_enable)
+            f1_score_calc_array_h, f2_score_calc_array_h, f05_score_calc_array_h, threshold_array_h, precision_array_h, recall_array_h, sensitivity_array_h, specificity_fn_array_h, accuracy_array_h, max_index_1_av,max_index_2_av,max_index_05_av = f_score(
+                fp_array_1_split, tn_array_1_split, fn_array_2_split, tp_array_2_split, fp_array_3_split,tn_array_3_split,
+                fp_array_4_split, tn_array_4_split, selected_dataset, image_count, 'histogram',result_folder,temp_enable,kf.n_splits,test_index_cv)
         elif temp_enable is True and (pix_enable is False and hist_enable is False):
-            f1_score_calc_array_t, f2_score_calc_array_t, f05_score_calc_array_t, threshold_array_t, precision_array_t, recall_array_t, sensitivity_array_t, specificity_fn_array_t, accuracy_array_t = f_score(
-                fp_array_1_t, tn_array_1_t, fn_array_2_t, tp_array_2_t, fp_array_3_t, tn_array_3_t, fp_array_4_t,
-                tn_array_4_t, selected_dataset, image_count, 'template',result_folder,temp_enable)
+            f1_score_calc_array_t, f2_score_calc_array_t, f05_score_calc_array_t, threshold_array_t, precision_array_t, recall_array_t, sensitivity_array_t, specificity_fn_array_t, accuracy_array_t, max_index_1_av,max_index_2_av,max_index_05_av = f_score(
+                fp_array_1_split, tn_array_1_split, fn_array_2_split, tp_array_2_split, fp_array_3_split,tn_array_3_split,
+                fp_array_4_split, tn_array_4_split, selected_dataset, image_count, 'template',result_folder,temp_enable,kf.n_splits,test_index_cv)
         elif pix_enable is True and (hist_enable is False and temp_enable is False):
-            f1_score_calc_array_p, f2_score_calc_array_p, f05_score_calc_array_p, threshold_array_p, precision_array_p, recall_array_p, sensitivity_array_p, specificity_fn_array_p, accuracy_array_p = f_score(
-                fp_array_1_p, tn_array_1_p, fn_array_2_p, tp_array_2_p, fp_array_3_p, tn_array_3_p, fp_array_4_p,
-                tn_array_4_p, selected_dataset, image_count, 'pixel',result_folder,temp_enable)
+            f1_score_calc_array_p, f2_score_calc_array_p, f05_score_calc_array_p, threshold_array_p, precision_array_p, recall_array_p, sensitivity_array_p, specificity_fn_array_p, accuracy_array_p, max_index_1_av,max_index_2_av,max_index_05_av = f_score(
+                fp_array_1_split, tn_array_1_split, fn_array_2_split, tp_array_2_split, fp_array_3_split,tn_array_3_split,
+                fp_array_4_split, tn_array_4_split, selected_dataset, image_count, 'pixel',result_folder,temp_enable,kf.n_splits,test_index_cv)
+
+    crossValidation(hist_matching_array_test,pixel_comp_array_test,template_matching_array_test,test_index_cv,max_index_1_av,max_index_2_av,max_index_05_av)
+
 
     for i in range(0, len(window_sizes), 1):
         if hist_enable and temp_enable and pix_enable is True:
