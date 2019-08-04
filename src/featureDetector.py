@@ -73,7 +73,7 @@ def SIMPLEBLOB_feature(img):
 
     # Change thresholds
     params.minThreshold = 10;
-    params.maxThreshold = 2000;
+    params.maxThreshold = 200;
 
     # Filter by Area.
     params.filterByArea = True
