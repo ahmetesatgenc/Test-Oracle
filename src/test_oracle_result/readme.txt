@@ -1,1 +1,1 @@
-Results acording to configuration will written within this folder
+Results acording to configuration will be written within this folder
